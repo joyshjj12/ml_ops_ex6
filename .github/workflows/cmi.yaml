@@ -38,5 +38,6 @@ jobs:
           echo "\n## Model Performance" >> report.md
           echo "Model performance metrics are on the plot below." >> report.md
           
-          cml-publish model_results.png --md >> report.md || echo "cml-publish failed"
-          cml-send-comment report.md || echo "cml-send-comment failed"
+          # Use full path for cml-publish and cml-send-comment
+          $(npm root -g)/../.bin/cml-publish model_results.png --md >> report.md || echo "cml-publish failed"
+          $(npm root -g)/../.bin/cml-send-comment report.md || echo "cml-send-comment failed"
