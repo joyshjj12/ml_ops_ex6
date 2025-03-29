@@ -1,24 +1,28 @@
-name: mlops-example-tensorflow-regression
+name: model-training
 on: [push]
 jobs:
   run:
     runs-on: ubuntu-latest
-    container: docker://dvcorg/cml-py3:latest
+    container: tensorflow/tensorflow:latest  # Use TensorFlow container (compatible with GLIBC)
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      - name: Train my model
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - uses: iterative/setup-cml@v1
+      
+      - name: Train model
         env:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           pip install -r requirements.txt
-          python model.py
+          python train.py
           
-          echo "## Model Metrics" > report.md
+          # Create report
           cat metrics.txt >> report.md
-          echo "\n## Model Performance" >> report.md
-          echo "Model performance metrics are on the plot below." >> report.md
+          echo "![](./plot.png)" >> report.md
           
-          cml-publish model_results.png --md >> report.md || echo "cml-publish failed"
-          cml-send-comment report.md || echo "cml-send-comment failed"
+          # Add comment using CML
+          cml comment create report.md || echo "cml comment failed"
