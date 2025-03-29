@@ -13,7 +13,7 @@ jobs:
           apt-get update
           apt-get install -y curl git
 
-      - name: Install Node.js using nvm
+      - name: Install Node.js and npm using nvm
         run: |
           curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
           export NVM_DIR="$HOME/.nvm"
@@ -26,6 +26,7 @@ jobs:
 
       - name: Install CML
         run: |
+          export PATH="$HOME/.nvm/versions/node/v20.18.0/bin:$PATH"
           npm install -g @dvcorg/cml
 
       - name: Set up Git
