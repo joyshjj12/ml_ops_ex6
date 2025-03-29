@@ -26,10 +26,13 @@ jobs:
 
       - name: Install CML
         run: |
-          export NVM_DIR="$HOME/.nvm"
-          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-          export PATH="$HOME/.nvm/versions/node/v20.18.0/bin:$PATH"
           npm install -g @dvcorg/cml
+
+      - name: Set up Git
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
 
       - name: Train my model
         env:
@@ -44,6 +47,5 @@ jobs:
           echo "\n## Model Performance" >> report.md
           echo "Model performance metrics are on the plot below." >> report.md
           
-          export PATH="$HOME/.nvm/versions/node/v20.18.0/bin:$PATH"
           cml-publish model_results.png --md >> report.md
           cml-send-comment report.md
