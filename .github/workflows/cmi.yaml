@@ -27,7 +27,6 @@ jobs:
           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
           npm install -g @dvcorg/cml
 
-      # ✅ Add Node.js and npm to PATH to fix cml-publish issue
       - name: Add Node.js and npm to PATH
         run: |
           export PATH="$HOME/.nvm/versions/node/v20.18.0/bin:$PATH"
@@ -47,6 +46,7 @@ jobs:
           echo "\n## Model Performance" >> report.md
           echo "Model performance metrics are on the plot below." >> report.md
           
-          cml-publish model_results.png --md >> report.md
+          # ✅ Use `cml comment create` to publish image instead of `cml-publish`
+          cml comment create --file model_results.png >> report.md
           
-          cml-send-comment report.md
+          cml comment create report.md
