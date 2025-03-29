@@ -1,12 +1,15 @@
 name: mlops-example-tensorflow-regression
 on: [push]
+
 jobs:
   run:
     runs-on: ubuntu-latest
     container: docker://tensorflow/tensorflow:latest
+
     steps:
-      - uses: actions/checkout@v4
-      
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
       - name: Install dependencies
         run: |
           apt-get update
@@ -21,19 +24,13 @@ jobs:
           nvm use 20.18.0
           node -v
 
-      - name: Install CML
+      - name: Install CML (latest version)
         run: |
           export NVM_DIR="$HOME/.nvm"
           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-          npm install -g @dvcorg/cml
+          npm install -g @dvcorg/cml@latest
 
-      - name: Add Node.js and npm to PATH
-        run: |
-          export PATH="$HOME/.nvm/versions/node/v20.18.0/bin:$PATH"
-          export PATH="$(npm get prefix)/bin:$PATH"
-          cml -h
-
-      - name: 'Train my model'
+      - name: Train the model
         env:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -46,7 +43,8 @@ jobs:
           echo "\n## Model Performance" >> report.md
           echo "Model performance metrics are on the plot below." >> report.md
           
-          # ✅ Use `cml comment create` to publish image instead of `cml-publish`
-          cml comment create --file model_results.png >> report.md
+          # Publish model results using `cml comment create` instead of `cml-publish`
+          npx @dvcorg/cml comment create --file model_results.png >> report.md
           
-          cml comment create report.md
+          # Send report as a comment on the PR
+          npx @dvcorg/cml comment create report.md
