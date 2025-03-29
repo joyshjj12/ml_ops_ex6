@@ -1,35 +1,26 @@
-name: mlops-example-tensorflow-regression
+name: model-training
 on: [push]
 jobs:
   run:
     runs-on: ubuntu-latest
-    container: docker://tensorflow/tensorflow:latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Node.js and npm using nvm
-        run: |
-          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
-          export NVM_DIR="$HOME/.nvm"
-          [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-          nvm install 20.18.0
-          nvm use 20.18.0
-          npm install -g @dvcorg/cml
-          export PATH="$HOME/.nvm/versions/node/v20.18.0/bin:$PATH"
-          ln -sf $HOME/.nvm/versions/node/v20.18.0/bin/cml /usr/local/bin/cml
-
-      - name: Train my model
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+      - uses: iterative/setup-cml@v1
+      - name: Train model
         env:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           pip install -r requirements.txt
-          python model.py
+          python train.py
+
+          # Add metrics and plot to report
           echo "## Model Metrics" > report.md
           cat metrics.txt >> report.md
           echo "\n## Model Performance" >> report.md
-          echo "Model performance metrics are on the plot below." >> report.md
-          cml publish model_results.png --md >> report.md || echo "cml-publish failed"
-          cml send-comment report.md || echo "cml-send-comment failed"
+          echo "Model performance metrics are shown below." >> report.md
+          echo "![](./plot.png)" >> report.md
 
-      
+          # Publish plot and comment
+          cml publish plot.png --md >> report.md || echo "cml-publish failed"
+          cml comment create report.md || echo "cml-send-comment failed"
