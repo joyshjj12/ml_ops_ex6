@@ -15,8 +15,10 @@ jobs:
           [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
           nvm install 20.18.0
           nvm use 20.18.0
-          export PATH="$HOME/.nvm/versions/node/v20.18.0/bin:$PATH"
+          npm config set prefix "$HOME/.npm-global"
+          export PATH="$HOME/.npm-global/bin:$PATH"
           npm install -g @dvcorg/cml
+          which cml-publish  # Debug to confirm installation
 
       - name: Train my model
         env:
