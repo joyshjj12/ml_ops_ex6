@@ -1,6 +1,6 @@
 name: mlops-example-tensorflow-regression
 on: [push]
-jobs: 
+jobs:
   run:
     runs-on: ubuntu-latest
     container: docker://tensorflow/tensorflow:latest
@@ -24,6 +24,7 @@ jobs:
           
           # Debug if cml-publish is found
           which cml-publish || echo "cml-publish not found"
+          which cml-send-comment || echo "cml-send-comment not found"
 
       - name: Train my model
         env:
@@ -38,5 +39,6 @@ jobs:
           echo "\n## Model Performance" >> report.md
           echo "Model performance metrics are on the plot below." >> report.md
           
-          cml-publish model_results.png --md >> report.md || echo "cml-publish failed"
-          cml-send-comment report.md || echo "cml-send-comment failed"
+          # Use full path to cml commands
+          $(npm root -g)/../.bin/cml-publish model_results.png --md >> report.md || echo "cml-publish failed"
+          $(npm root -g)/../.bin/cml-send-comment report.md || echo "cml-send-comment failed"
