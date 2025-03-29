@@ -2,14 +2,14 @@ name: model-training
 on: [push]
 jobs:
   run:
-    runs-on: ubuntu-latest 
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
       - uses: iterative/setup-cml@v1
       - name: Train model
         env:
-          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO_TOKEN: ${{ secrets.Joy12_Token }}
         run: |
           pip install -r requirements.txt
           python model.py
