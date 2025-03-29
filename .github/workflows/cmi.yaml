@@ -8,11 +8,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: |
-          apt-get update
-          apt-get install -y curl git
-
       - name: Install Node.js and npm using nvm
         run: |
           curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
@@ -21,19 +16,7 @@ jobs:
           nvm install 20.18.0
           nvm use 20.18.0
           export PATH="$HOME/.nvm/versions/node/v20.18.0/bin:$PATH"
-          echo "Node version:" $(node -v)
-          echo "NPM version:" $(npm -v)
-
-      - name: Install CML
-        run: |
-          export PATH="$HOME/.nvm/versions/node/v20.18.0/bin:$PATH"
           npm install -g @dvcorg/cml
-
-      - name: Set up Git
-        run: |
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
 
       - name: Train my model
         env:
