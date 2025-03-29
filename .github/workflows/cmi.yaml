@@ -15,11 +15,10 @@ jobs:
           [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
           nvm install 20.18.0
           nvm use 20.18.0
-          
           npm install -g @dvcorg/cml
-          
-          # Add the correct npm bin path to $PATH
           export PATH="$HOME/.nvm/versions/node/v20.18.0/bin:$PATH"
+          ln -s $HOME/.nvm/versions/node/v20.18.0/bin/node /usr/bin/node
+
 
       - name: Train my model
         env:
