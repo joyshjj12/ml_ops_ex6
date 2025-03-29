@@ -46,5 +46,5 @@ jobs:
           # Publish model results using `cml comment create` instead of `cml-publish`
           npx @dvcorg/cml comment create --file model_results.png >> report.md
           
-          # Send report as a comment on the PR
+          # Send report as a comment on the PR 
           npx @dvcorg/cml comment create report.md
