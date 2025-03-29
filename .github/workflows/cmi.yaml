@@ -1,19 +1,17 @@
 name: mlops-example-tensorflow-regression
 on: [push]
-
 jobs:
   run:
     runs-on: ubuntu-latest
     container: docker://tensorflow/tensorflow:latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
+
       - name: Install dependencies
         run: |
           apt-get update
-          apt-get install -y curl
+          apt-get install -y curl git
 
       - name: Install Node.js using nvm
         run: |
@@ -22,34 +20,30 @@ jobs:
           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
           nvm install 20.18.0
           nvm use 20.18.0
+          export PATH="$HOME/.nvm/versions/node/v20.18.0/bin:$PATH"
           node -v
+          npm -v
 
-      - name: Install npm (for npx)
-        run: |
-          apt-get install -y npm
-
-
-      - name: Install CML (latest version)
+      - name: Install CML
         run: |
           export NVM_DIR="$HOME/.nvm"
           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-          npm install -g @dvcorg/cml@latest
+          export PATH="$HOME/.nvm/versions/node/v20.18.0/bin:$PATH"
+          npm install -g @dvcorg/cml
 
-      - name: Train the model
+      - name: Train my model
         env:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
         run: |
           pip install -r requirements.txt
           python model.py
-          
+
           echo "## Model Metrics" > report.md
           cat metrics.txt >> report.md
-          
+
           echo "\n## Model Performance" >> report.md
           echo "Model performance metrics are on the plot below." >> report.md
           
-          # Publish model results using `cml comment create` instead of `cml-publish`
-          npx @dvcorg/cml comment create --file model_results.png >> report.md
-          
-          # Send report as a comment on the PR 
-          npx @dvcorg/cml comment create report.md
+          export PATH="$HOME/.nvm/versions/node/v20.18.0/bin:$PATH"
+          cml-publish model_results.png --md >> report.md
+          cml-send-comment report.md
