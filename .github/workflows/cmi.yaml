@@ -15,10 +15,15 @@ jobs:
           [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
           nvm install 20.18.0
           nvm use 20.18.0
-          npm config set prefix "$HOME/.npm-global"
-          export PATH="$HOME/.npm-global/bin:$PATH"
+          
           npm install -g @dvcorg/cml
-          which cml-publish  # Debug to confirm installation
+          
+          # Add npm global path to $PATH
+          export PATH="$(npm root -g)/../.bin:$PATH"
+          echo "PATH updated: $PATH"
+          
+          # Debug if cml-publish is found
+          which cml-publish || echo "cml-publish not found"
 
       - name: Train my model
         env:
@@ -33,5 +38,5 @@ jobs:
           echo "\n## Model Performance" >> report.md
           echo "Model performance metrics are on the plot below." >> report.md
           
-          cml-publish model_results.png --md >> report.md
-          cml-send-comment report.md
+          cml-publish model_results.png --md >> report.md || echo "cml-publish failed"
+          cml-send-comment report.md || echo "cml-send-comment failed"
