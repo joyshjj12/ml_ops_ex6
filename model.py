@@ -63,34 +63,38 @@ y_test = y[40:]
 
 
 # Take a single example of X
-input_shape = X[0].shape 
+# Reshape inputs to 2D
+X_train = X_train.reshape(-1, 1)
+X_test = X_test.reshape(-1, 1)
 
-# Take a single example of y
-output_shape = y[0].shape
-
-
-# Set random seed
-tf.random.set_seed(42)
+# Input shape
+input_shape = X_train[0].shape
 
 # Create a model using the Sequential API
+# Create a model using the Sequential API
 model = tf.keras.Sequential([
-    tf.keras.layers.Dense(1), 
-    tf.keras.layers.Dense(1)
-    ])
+    tf.keras.layers.Dense(1, input_shape=input_shape)
+])
 
-# Compile the model
-model.compile(loss = tf.keras.losses.mae,
-              optimizer = tf.keras.optimizers.SGD(),
-              metrics = ['mae'])
+# Compile and train
+model.compile(loss='mae',
+              optimizer=tf.keras.optimizers.SGD(),
+              metrics=['mae'])
 
-# Fit the model
 model.fit(X_train, y_train, epochs=100)
-
 
 # Make and plot predictions for model_1
 y_preds = model.predict(X_test)
 plot_predictions(train_data=X_train, train_labels=y_train,  test_data=X_test, test_labels=y_test,  predictions=y_preds)
 
+# Fix MAE and MSE calculations
+from tensorflow.keras import backend as K
+
+def mae(y_test, y_pred):
+    return K.mean(K.abs(y_test - y_pred))
+
+def mse(y_test, y_pred):
+    return K.mean(K.square(y_test - y_pred))
 
 # Calculate model_1 metrics
 mae_1 = np.round(float(mae(y_test, y_preds.squeeze()).numpy()), 2)
@@ -100,3 +104,4 @@ print(f'\nMean Absolute Error = {mae_1}, Mean Squared Error = {mse_1}.')
 # Write metrics to file
 with open('metrics.txt', 'w') as outfile:
     outfile.write(f'\nMean Absolute Error = {mae_1}, Mean Squared Error = {mse_1}.')
+
