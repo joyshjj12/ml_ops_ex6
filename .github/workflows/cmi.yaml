@@ -27,6 +27,13 @@ jobs:
           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
           npm install -g @dvcorg/cml
 
+      # ✅ Add Node.js and npm to PATH to fix cml-publish issue
+      - name: Add Node.js and npm to PATH
+        run: |
+          export PATH="$HOME/.nvm/versions/node/v20.18.0/bin:$PATH"
+          export PATH="$(npm get prefix)/bin:$PATH"
+          cml -h
+
       - name: 'Train my model'
         env:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
