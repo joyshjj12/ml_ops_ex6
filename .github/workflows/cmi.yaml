@@ -2,15 +2,18 @@ name: mlops-example-tensorflow-regression
 on: [push]
 jobs:
   run:
-    runs-on: [ubuntu-latest]
+    runs-on: ubuntu-latest
     container: docker://tensorflow/tensorflow:latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install Node.js using nvm
+      
+      - name: Install dependencies
         run: |
           apt-get update
           apt-get install -y curl
+
+      - name: Install Node.js using nvm
+        run: |
           curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
           export NVM_DIR="$HOME/.nvm"
           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
@@ -18,14 +21,10 @@ jobs:
           nvm use 20.18.0
           node -v
 
-      
-      - name: Install dependencies
-        run: |
-          apt-get update
-          apt-get install -y libc6 npm
-
       - name: Install CML
         run: |
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
           npm install -g @dvcorg/cml
 
       - name: 'Train my model'
@@ -44,4 +43,3 @@ jobs:
           cml-publish model_results.png --md >> report.md
           
           cml-send-comment report.md
- 
