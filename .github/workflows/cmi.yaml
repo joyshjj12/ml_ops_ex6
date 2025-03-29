@@ -12,15 +12,13 @@ jobs:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           pip install -r requirements.txt
-          python model.py
+          python train.py
 
-          # Add metrics and plot to report
-          echo "## Model Metrics" > report.md
           cat metrics.txt >> report.md
-          echo "\n## Model Performance" >> report.md
-          echo "Model performance metrics are shown below." >> report.md
-          echo "![](./plot.png)" >> report.md
+          echo "![](./model_results.png)" >> report.md
 
-          # Publish plot and comment
-          cml publish plot.png --md >> report.md || echo "cml-publish failed"
-          cml comment create report.md || echo "cml-send-comment failed"
+          if [ -f "model_results.png" ]; then
+              cml comment create report.md || echo "cml comment failed"
+          else
+              echo "model_results.png not found"
+          fi
