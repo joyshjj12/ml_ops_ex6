@@ -34,5 +34,6 @@ jobs:
           echo "\n## Model Performance" >> report.md
           echo "Model performance metrics are on the plot below." >> report.md
           
-          cml-publish model_results.png --md >> report.md || echo "cml-publish failed"
-          cml-send-comment report.md || echo "cml-send-comment failed"
+          /github/home/.nvm/versions/node/v20.18.0/bin/cml-publish model_results.png --md >> report.md || echo "cml-publish failed"
+          /github/home/.nvm/versions/node/v20.18.0/bin/cml-send-comment report.md || echo "cml-send-comment failed"
+
