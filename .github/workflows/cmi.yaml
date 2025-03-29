@@ -8,36 +8,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Node.js and npm using nvm
-        run: |
-          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
-          export NVM_DIR="$HOME/.nvm"
-          [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-          nvm install 20.18.0
-          nvm use 20.18.0
-          
-          npm install -g @dvcorg/cml
-          
-          # Add npm global path to $PATH
-          export PATH="$(npm root -g)/../.bin:$PATH"
-          echo "PATH updated: $PATH"
-          
-          # Debug if cml-publish is found
-          which cml-publish || echo "cml-publish not found"
-
       - name: Train my model
         env:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
         run: |
           pip install -r requirements.txt
           python model.py
-
+          
           echo "## Model Metrics" > report.md
           cat metrics.txt >> report.md
-
           echo "\n## Model Performance" >> report.md
           echo "Model performance metrics are on the plot below." >> report.md
           
-          # Use full path for cml-publish and cml-send-comment
-          $(npm root -g)/../.bin/cml-publish model_results.png --md >> report.md || echo "cml-publish failed"
-          $(npm root -g)/../.bin/cml-send-comment report.md || echo "cml-send-comment failed"
+          cml-publish model_results.png --md >> report.md || echo "cml-publish failed"
+          cml-send-comment report.md || echo "cml-send-comment failed"
