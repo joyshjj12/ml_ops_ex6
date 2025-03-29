@@ -1,6 +1,6 @@
 name: mlops-example-tensorflow-regression
 on: [push]
-jobs:
+jobs: 
   run:
     runs-on: ubuntu-latest
     container: docker://tensorflow/tensorflow:latest
